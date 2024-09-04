@@ -1,18 +1,23 @@
-let tasks = [];
-let idCounter = 1;
+//tarefas
+const tasks = [
+  { id: '1', title: 'estudar GraphQL', completed: false },
+  { id: '2', title: 'aprender nodejs', completed: false },
+];
+
+let idCounter = 1; //contador para o id
 
 const resolvers = {
-  getTasks: () => tasks,
+  getTasks: () => tasks, //busca todas as tarefas
 
-  getTask: ({ id }) => tasks.find(task => task.id == id),
+  getTask: ({ id }) => tasks.find(task => task.id == id), //busca tarefa especifica pelo id
 
-  addTask: ({ title }) => {
+  addTask: ({ title }) => { //adiciona uma nova tarefa
     const newTask = { id: idCounter++, title, completed: false };
     tasks.push(newTask);
     return newTask;
   },
 
-  updateTask: ({ id, title, completed }) => {
+  updateTask: ({ id, title, completed }) => { // atualiza uma tarefa
     let task = tasks.find(task => task.id == id);
     if (task) {
       if (title !== undefined) task.title = title;
@@ -22,7 +27,7 @@ const resolvers = {
     return null;
   },
 
-  deleteTask: ({ id }) => {
+  deleteTask: ({ id }) => { //deleta uma tarefa
     const initialLength = tasks.length;
     tasks = tasks.filter(task => task.id != id);
     return tasks.length < initialLength ? 'Tarefa deletada' : 'Tarefa nao encontrada';

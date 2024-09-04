@@ -11,7 +11,7 @@ const app = express();
 app.use('/graphql', graphqlHTTP({
   schema: schema, 
   rootValue: resolvers,
-  graphiql: true,
+  graphiql: true, // Habilita a interface do GraphiQL para testar as queries
 }));
 
 app.listen(port, () => console.log('Servidor GraphQL rodando na porta 4000'));
