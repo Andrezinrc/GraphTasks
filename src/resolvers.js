@@ -1,37 +1,67 @@
-//tarefas
-const tasks = [
-  { id: '1', title: 'estudar GraphQL', completed: false },
-  { id: '2', title: 'aprender nodejs', completed: false },
-];
+const db = require('../config/db');
+// const tasks = [
+//   { id: '1', title: 'estudar GraphQL', completed: false },
+//   { id: '2', title: 'aprender nodejs', completed: false },
+// ];
 
-let idCounter = 1; //contador para o id
+// let idCounter = 1;
 
 const resolvers = {
-  getTasks: () => tasks, //busca todas as tarefas
-
-  getTask: ({ id }) => tasks.find(task => task.id == id), //busca tarefa especifica pelo id
-
-  addTask: ({ title }) => { //adiciona uma nova tarefa
-    const newTask = { id: idCounter++, title, completed: false };
-    tasks.push(newTask);
-    return newTask;
+  getTasks: () => {
+    return new Promise((resolve, reject) => {
+      const sql = 'SELECT * FROM tasks';
+      db.query(sql, (err, results) => {
+        if(err) reject(err);
+        if(results.length === 0){
+          reject('Nao a tarefas');
+        }
+        else resolve(results);
+      });
+    });
   },
 
-  updateTask: ({ id, title, completed }) => { // atualiza uma tarefa
-    let task = tasks.find(task => task.id == id);
-    if (task) {
-      if (title !== undefined) task.title = title;
-      if (completed !== undefined) task.completed = completed;
-      return task;
-    }
-    return null;
+  getTask: ({ id }) => {
+    return new Promise((resolve, reject) => {
+      const sql = 'SELECT * FROM tasks WHERE id = ?';
+      db.query(sql, [id], (err, results) => {
+        if(err) reject(err);
+        else resolve(results[0]);
+      });
+    });
   },
 
-  deleteTask: ({ id }) => { //deleta uma tarefa
-    const initialLength = tasks.length;
-    tasks = tasks.filter(task => task.id != id);
-    return tasks.length < initialLength ? 'Tarefa deletada' : 'Tarefa nao encontrada';
-  }
+  addTask: ({ title }) => {
+    return new Promise((resolve, reject) => {
+      const sql = 'INSERT INTO tasks (title, completed) VALUES (?, ?)';
+      db.query(sql, [title, false], (err, results) => {
+        if(err) reject(err);
+        else {
+          const newTask = { id: results.insertId, title, completed: false };
+          resolve(newTask);
+        };
+      });
+    });
+  },
+
+  updateTask: ({ id, title, completed }) => {
+    return new Promise((resolve, reject) => {
+      const sql = 'UPDATE tasks SET title = ?, completed = ? WHERE id = ?';
+      db.query(sql, [title, completed, id], (err, results) => {
+        if(err) reject(err);
+        else resolve({ id, title, completed });
+      });
+    });
+  },
+
+  deleteTask: ({ id }) => {
+    return new Promise((resolve, reject) => {
+      const sql = 'DELETE FROM tasks WHERE id = ?';
+      db.query(sql, [id], (err, results) => {
+        if(err) reject(err);
+        else resolve('Tarefa deletada com sucesso');
+      });
+    });
+  },
 };
 
 module.exports = { resolvers };
