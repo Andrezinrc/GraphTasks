@@ -1,7 +1,7 @@
-const { buildSchema } = require('graphql');
+const graphql = require('graphql');
 
 // Define o schema GraphQL
-const schema = buildSchema(`
+const schema = graphql.buildSchema(`
   type Task {
     id: ID!
     title: String!
@@ -20,4 +20,5 @@ const schema = buildSchema(`
   }
 `);
 
-module.exports = { schema };
+// Exportando o schema corretamente
+module.exports = schema; // Exporta o schema diretamente
